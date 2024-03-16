@@ -59,6 +59,7 @@ The problem statement required implementing the algorithms related to coresets a
 
 ## Screenshots
 Screenshots demonstrating the implementation.
+![Alt text](/screen.png?raw=true "Screenshot")
 
 ## Demo
 

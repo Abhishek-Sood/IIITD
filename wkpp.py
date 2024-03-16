@@ -3,6 +3,7 @@ from sklearn.utils.extmath import stable_cumsum,row_norms
 import scipy.sparse as sp
 import numpy as np
 from sklearn.utils import check_array,check_random_state
+from random import randint
 def kmeans_plusplus_w(
     X, n_clusters, *, x_squared_norms=None, random_state=None, n_local_trials=None,w=None):
     """Init n_clusters seeds according to k-means++.
@@ -126,9 +127,13 @@ def _kmeans_plusplus_w(X, n_clusters, x_squared_norms=None, random_state=None, n
         n_local_trials = 2 + int(np.log(n_clusters))
 
     # Pick first center randomly and track index of point
-    prob = 1/w
-    prob = prob/sum(prob)
-    center_id = np.random.choice(range(n_samples), size=1, p=prob)
+    prob = 1 / np.array(w)
+    prob /= np.sum(prob)
+
+    # Generate random choice using probabilities
+    center_id = np.random.choice(range(len(w)), size=(1,), p=prob)
+    center_id = np.random.choice(range(n_samples), size=(1,), p=prob)
+
     # center_id = random_state.randint(n_samples)
     indices = np.full(n_clusters, -1, dtype=int)
     if sp.issparse(X):

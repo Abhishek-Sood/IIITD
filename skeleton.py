@@ -24,24 +24,62 @@ d = np.size(data,1)										# Number of dimension/features in the dataset.
 k = 17													# Number of clusters (say k = 17)
 Sample_size = 100										# Desired coreset size (say m = 100)
 
-
-def D2(data,k):											# D2-Sampling function.
-
-
-	#----------Your code for Algo-1----------#
-
-
-	return center 										# Returns B from Algo-1.
-
+def D2(data, k):
+    # Initialize B with one random point from data
+    B = [data[np.random.choice(range(n))]]
+    for _ in range(1, k):
+        print("Current k is ", k)
+        # Calculate the distance from each point in data to the set B
+        distances = np.min(cdist(data, B, 'euclidean')**2, axis=1)
+        print("Distances",distances)
+        # Calculate the probabilities for each point
+        probabilities = distances / np.sum(distances)
+        print("Probabilities",probabilities)
+        # Sample a new point based on the calculated probabilities
+        B.append(data[np.random.choice(range(n), p=probabilities)])
+        print("B",B)
+    return np.array(B)
+	
 centers = D2(data,k)									# Call D2-Sampling (D2())
+def Sampling(data, k, centers, Sample_size):
+    # Initialize arrays to store distances and weights
+    distances = np.zeros(len(data))
+    weights = np.zeros(len(data))
+    
+    # First loop: Calculate the distance from each point in data to the nearest center
+    for i in range(len(data)):
+        min_distance = float('inf')
+        for j in range(len(centers)):
+            distance = np.linalg.norm(data[i] - centers[j])**2
+            if distance < min_distance:
+                min_distance = distance
+        distances[i] = min_distance
+    
+    phi = np.sum(distances) / len(data)
+    
+    # Second loop: Calculate the sampling probabilities for each point
+    probabilities = np.zeros(len(data))
+    
+    for i in range(len(distances)):
+        probabilities[i] = distances[i] / phi
+    
+    # Normalize the probabilities
+    probabilities /= np.sum(probabilities)
+    
+    # Third loop: Sample points based on calculated probabilities and calculate their weights 
+    coreset_indices = []
+    coreset_weights = []
+    
+    for _ in range(Sample_size):
+        index = np.random.choice(len(data), p=probabilities)
+        coreset_indices.append(index)
+        weight = 1 / (Sample_size * probabilities[index])
+        weights.append(weight)
 
-def Sampling(data,k,centers,Sample_size):				# Coreset construction function.
+    coreset = data[coreset_indices]
+    
+    return coreset, weights
 
-
-	#----------Your code for Algo-2----------#
-
-
-	return coreset, weight 								# Return coreset points and its weights.
 
 coreset, weight = Sampling(data,k,centers,Sample_size)	# Call coreset construction algorithm (Sampling())
 
